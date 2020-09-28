@@ -7,8 +7,11 @@ import Input from '../../components/Input'
 import { Container, Title, ForgotPassword, ForgotPasswordText, CreateAccountButton, CreateAccountButtonText, Icon } from './styles'
 import logoImg from '../../assets/logo.png'
 import { ScrollView } from 'react-native-gesture-handler'
+import { useNavigation } from '@react-navigation/native'
 
 const LogIn: React.FC = () => {
+  const navigation = useNavigation();
+
   return (
     <>
       <KeyboardAvoidingView
@@ -31,7 +34,7 @@ const LogIn: React.FC = () => {
           </Container>
         </ScrollView>
       </KeyboardAvoidingView>
-      <CreateAccountButton onPress={() => { }} >
+      <CreateAccountButton onPress={() => navigation.navigate('SignUp')} >
         <Icon name="log-in" size={20} color="#ff9000" />
         <CreateAccountButtonText>Create account</CreateAccountButtonText>
       </CreateAccountButton>
