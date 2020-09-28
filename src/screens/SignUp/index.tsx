@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { View, Image, KeyboardAvoidingView, Platform } from 'react-native'
 
 import Button from '../../components/Button'
@@ -8,9 +8,12 @@ import { Container, Title, BackToLoginButton, BackToLoginButtonText, Icon } from
 import logoImg from '../../assets/logo.png'
 import { ScrollView } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
+import { Form } from '@unform/mobile'
+import { FormHandles } from '@unform/core'
 
 const SignUp: React.FC = () => {
   const navigation = useNavigation();
+  const formRef = useRef<FormHandles>(null)
 
   return (
     <>
@@ -25,13 +28,16 @@ const SignUp: React.FC = () => {
             <View>
               <Title>Sign Up</Title>
             </View>
-            <Input name="name" icon="user" placeholder="name" />
-            <Input name="email" icon="mail" placeholder="email" />
-            <Input name="password" icon="lock" placeholder="password" />
-            <Button onPress={() => { console.log() }}>Create account</Button>
+            <Form ref={formRef} onSubmit={(data) => { console.log(data) }}>
+              <Input name="name" icon="user" placeholder="name" />
+              <Input name="email" icon="mail" placeholder="email" />
+              <Input name="password" icon="lock" placeholder="password" />
+              <Button onPress={() => { formRef.current?.submitForm() }}>Create account</Button>
+            </Form>
           </Container>
         </ScrollView>
       </KeyboardAvoidingView>
+
       <BackToLoginButton onPress={() => navigation.goBack()} >
         <Icon name="arrow-left" size={20} color="#ffffff" />
         <BackToLoginButtonText>Back to log in</BackToLoginButtonText>
