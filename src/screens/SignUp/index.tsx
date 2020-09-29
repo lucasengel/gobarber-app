@@ -1,10 +1,17 @@
 import React, { useRef, useCallback } from 'react';
-import { View, Image, KeyboardAvoidingView, Platform, TextInput, Alert } from 'react-native';
+import {
+  View,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  TextInput,
+  Alert,
+} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
-import * as Yup from 'yup'
+import * as Yup from 'yup';
 
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -18,6 +25,7 @@ import {
 } from './styles';
 import logoImg from '../../assets/logo.png';
 import getValidationErrors from '../../utils/getValidationErrors';
+import api from '../../services/api';
 
 interface SignUpFormData {
   name: string;
@@ -28,41 +36,43 @@ interface SignUpFormData {
 const SignUp: React.FC = () => {
   const navigation = useNavigation();
   const formRef = useRef<FormHandles>(null);
-  const emailInputRef = useRef<TextInput>(null)
-  const passwordInputRef = useRef<TextInput>(null)
+  const emailInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
 
-  const handleSignUp = useCallback(async (data: SignUpFormData) => {
-    formRef.current?.setErrors({});
+  const handleSignUp = useCallback(
+    async (data: SignUpFormData) => {
+      formRef.current?.setErrors({});
 
-    const schema = Yup.object().shape({
-      name: Yup.string().required('Name is mandatory.'),
-      email: Yup.string()
-        .required('Email is mandatory.')
-        .email('Invalid email.'),
-      password: Yup.string().required('Password is mandatory.'),
-    });
-
-    try {
-      await schema.validate(data, {
-        abortEarly: false,
+      const schema = Yup.object().shape({
+        name: Yup.string().required('Name is mandatory.'),
+        email: Yup.string()
+          .required('Email is mandatory.')
+          .email('Invalid email.'),
+        password: Yup.string().required('Password is mandatory.'),
       });
 
-      // await logIn({
-      //   email: data.email,
-      //   password: data.password,
-      // });
+      try {
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-      // history.push('/dashboard');
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(error);
+        await api.post('/users', data);
 
-        formRef.current?.setErrors(errors);
+        Alert.alert('Successfully signed up', 'You can login.');
+
+        navigation.goBack();
+      } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(error);
+
+          formRef.current?.setErrors(errors);
+        }
+
+        Alert.alert("Couldn't create user", 'Check fields for errors.');
       }
-
-      Alert.alert('Couldn\'t create user', 'Check fields for errors.')
-    }
-  }, []);
+    },
+    [navigation],
+  );
 
   return (
     <>
@@ -80,19 +90,15 @@ const SignUp: React.FC = () => {
             <View>
               <Title>Sign Up</Title>
             </View>
-            <Form
-              ref={formRef}
-              onSubmit={handleSignUp}
-            >
+            <Form ref={formRef} onSubmit={handleSignUp}>
               <Input
-
                 autoCapitalize="words"
                 name="name"
                 icon="user"
                 placeholder="name"
                 returnKeyType="next"
                 onSubmitEditing={() => {
-                  emailInputRef.current?.focus()
+                  emailInputRef.current?.focus();
                 }}
               />
               <Input
@@ -105,7 +111,7 @@ const SignUp: React.FC = () => {
                 placeholder="email"
                 returnKeyType="next"
                 onSubmitEditing={() => {
-                  passwordInputRef.current?.focus()
+                  passwordInputRef.current?.focus();
                 }}
               />
               <Input
