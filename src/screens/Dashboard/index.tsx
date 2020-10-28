@@ -32,7 +32,6 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const { navigate } = useNavigation()
 
-
   useEffect(() => {
     api.get('/providers').then(({ data }) => {
       setProviders(data)
