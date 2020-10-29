@@ -29,3 +29,5 @@ export const UserAvatar = styled.Image`
   height: 186px;
   width: 186px;
 `
+
+export const LogOutButton = styled.Button``

@@ -5,6 +5,7 @@ import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
 import Icon from 'react-native-vector-icons/Feather'
+import ImagePicker from 'react-native-image-picker'
 import {
   View,
   KeyboardAvoidingView,
@@ -22,7 +23,9 @@ import {
   BackButton,
   Title,
   UserAvatarButton,
-  UserAvatar
+  UserAvatar,
+  LogOutButton,
+  LogOutButtonText
 } from './styles'
 import Button from '../../components/Button'
 import Input from '../../components/Input';
@@ -118,6 +121,34 @@ const Profile: React.FC = () => {
     [goBack, updateUser],
   );
 
+  const handleUpdateAvatar = useCallback(
+    () => {
+      ImagePicker.showImagePicker({}, response => {
+        if (response.didCancel) {
+          return
+        }
+
+        if (response.error) {
+          Alert.alert('Error updating image', 'Make sure the file is less than 500kb.')
+          return
+        }
+
+        const formData = new FormData();
+
+        formData.append('avatar', {
+          uri: response.uri,
+          type: 'image/jpeg',
+          name: `${user.id}.jpg`
+        })
+
+        api.patch('/users/avatar', formData).then(({ data }) => {
+          updateUser(data)
+        })
+      })
+    },
+    [updateUser, user.id],
+  )
+
   return (
     <>
       <KeyboardAvoidingView
@@ -134,7 +165,7 @@ const Profile: React.FC = () => {
               <Icon name="chevron-left" size={24} color="#999591" />
             </BackButton>
 
-            <UserAvatarButton>
+            <UserAvatarButton onPress={handleUpdateAvatar}>
               <UserAvatar source={{ uri: user.avatar_url }} />
             </UserAvatarButton>
 
@@ -216,12 +247,11 @@ const Profile: React.FC = () => {
               </Button>
             </Form>
           </Container>
+          <LogOutButton title="logout" onPress={handleLogOut}>log out
+          </LogOutButton>
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* <Button onPress={handleLogOut}>
-        log out
-      </Button> */}
     </>
   );
 };
